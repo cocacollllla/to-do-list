@@ -63,7 +63,7 @@ const CheckBoxIcon = styled(FontAwesomeIcon)`
 `;
 
 const CheckBoxInput = styled.input`
-display: none;
+  display: none;
 `;
 
 
@@ -90,8 +90,13 @@ const ModifyBtn = styled.button`
 `;
 
 const ModifyInput = styled.input`
+  width: 70%;
   background: transparent;
   border: none;
+  font-size: 1.2rem;
+  font-weight: 500;
+  padding-left: 15px;
+
   &:focus {
     outline: none;
   }
