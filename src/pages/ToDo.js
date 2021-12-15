@@ -3,23 +3,35 @@ import styled from 'styled-components';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashAlt, faPencilAlt } from "@fortawesome/free-solid-svg-icons";
 import { faSquare, faCheckSquare } from "@fortawesome/free-regular-svg-icons";
-import { connect } from 'react-redux';
+import { toDoActions } from '../store';
+import { useDispatch } from 'react-redux';
 
-const ToDo = ({ text, id, isDone, deleteToDo, doneToDo, modifyToDo }) => {
+const ToDo = ({ text, id, isDone }) => {
   const [isModify, setIsModify] = useState(false);
   const [modifyText, setModifyText] = useState(text);
+
+  const dispatch = useDispatch();
 
   const modifyBtn = () => {
     setIsModify(!isModify);
   }
 
-  const modifyDoneBtn = (txt) => {
+  const modifyDoneBtn = (text) => {
     setIsModify(!isModify);
-    modifyToDo(txt);
+    dispatch(toDoActions.modify({text, id}));
   }
 
   const handleChangeModifyInput = (e) => {
     setModifyText(e.target.value);
+  }
+
+  const doneToDo = () => {
+    dispatch(toDoActions.done(id));
+  }
+
+  const deleteToDo = () => {
+    console.log('zz');
+    dispatch(toDoActions.remove(id));
   }
 
 
@@ -42,16 +54,7 @@ const ToDo = ({ text, id, isDone, deleteToDo, doneToDo, modifyToDo }) => {
 };
 
 
-const mapDispatchToProps = (dispatch, ownProps) => {
-  return {
-    deleteToDo : () => dispatch({type:'del', id: ownProps.id}),
-    doneToDo : () => dispatch({type: 'done', id: ownProps.id}),
-    modifyToDo : (modifyText) => dispatch({type : 'modify', id: ownProps.id ,text: modifyText })
-  }
-}
-
-
-export default connect(null, mapDispatchToProps)(ToDo);
+export default ToDo;
 
 const ToDoList = styled.div`
   margin-bottom: 18px;

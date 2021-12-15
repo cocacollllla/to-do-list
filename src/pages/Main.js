@@ -1,13 +1,20 @@
 import React, {useState} from 'react';
-import { connect } from 'react-redux';
+import { toDoActions } from '../store';
+import { useSelector, useDispatch } from 'react-redux';
 import ToDo from './ToDo';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus} from "@fortawesome/free-solid-svg-icons";
 
-const Main = ({ todolist, newCreateToDo }) => {
+const Main = () => {
   const [text, setText] = useState('');
   const [currentId, setCurrentId] = useState(1);
+
+  const getStateList = useSelector(state => state);
+
+  const todolist = [...getStateList]; 
+  
+  const dispatch = useDispatch();
 
   const now = new Date();	
   const year = now.getFullYear();
@@ -18,11 +25,14 @@ const Main = ({ todolist, newCreateToDo }) => {
     setText(e.target.value);
   }
 
+
   const handleClickNewToDo = (e) => {
     e.preventDefault();
-    newCreateToDo(text);
+    dispatch(toDoActions.add(text));
     setText('');
   }
+
+
 
   todolist.sort((a,b) => {
     if(a.isDone === b.isDone){
@@ -72,20 +82,7 @@ const Main = ({ todolist, newCreateToDo }) => {
   );
 };
 
-const mapStateToProps = (state, ownProps) => {
-  
-  return {todolist : state}
- 
-}
-
-const mapDispatchToProps = (dispatch, ownProps) => {
-  return {
-    newCreateToDo : (text) => dispatch({type:'add', text: text})
-  }
-}
-
-
-export default connect(mapStateToProps, mapDispatchToProps)(Main);
+export default Main;
 
 
 
