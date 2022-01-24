@@ -1,12 +1,13 @@
 import React, {useState} from 'react';
 import styled from 'styled-components';
+import { useDispatch } from 'react-redux';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashAlt, faPencilAlt } from "@fortawesome/free-solid-svg-icons";
 import { faSquare, faCheckSquare } from "@fortawesome/free-regular-svg-icons";
-import { toDoActions } from '../store';
-import { useDispatch } from 'react-redux';
+import { dbService } from '../myFirebase';
+import { doneToDoData, modifyToDoData } from '../store/todo-actions';
 
-const ToDo = ({ text, id, isDone }) => {
+const ToDo = ({ text, id, isDone}) => {
   const [isModify, setIsModify] = useState(false);
   const [modifyText, setModifyText] = useState(text);
 
@@ -16,9 +17,9 @@ const ToDo = ({ text, id, isDone }) => {
     setIsModify(!isModify);
   }
 
-  const modifyDoneBtn = (text) => {
+  const modifyDoneBtn = async (text) => {
     setIsModify(!isModify);
-    dispatch(toDoActions.modify({text, id}));
+    dispatch(modifyToDoData(id, modifyText));
   }
 
   const handleChangeModifyInput = (e) => {
@@ -26,28 +27,27 @@ const ToDo = ({ text, id, isDone }) => {
   }
 
   const doneToDo = () => {
-    dispatch(toDoActions.done(id));
+    dispatch(doneToDoData(id, isDone));
   }
 
-  const deleteToDo = () => {
-    console.log('zz');
-    dispatch(toDoActions.remove(id));
+  const deleteToDo = async () => {
+    await dbService.collection('todo').doc(id).delete();
   }
-
 
   return (
- 
     <ToDoList>
       <label>
         <CheckBoxIcon icon={isDone ? faCheckSquare : faSquare}   />
         <CheckBoxInput type="checkbox" defaultChecked={isDone} onChange={doneToDo} />
-        {isModify ? <ModifyInput type="text" defaultValue={modifyText} onChange={handleChangeModifyInput} /> : <TextBox>{modifyText}</TextBox>}
+        {isModify ? <ModifyInput type="text" defaultValue={modifyText} onChange={handleChangeModifyInput} /> : <TextBox isDone={isDone}>{modifyText}</TextBox>}
       </label>
-      {isModify ? 
-        <ModifyBtn onClick={() => modifyDoneBtn(modifyText)}><FontAwesomeIcon icon={faPencilAlt}/></ModifyBtn>
-      : <ModifyBtn onClick={() => modifyBtn()}><FontAwesomeIcon icon={faPencilAlt}/></ModifyBtn>}
-      
-      <DeleteBtn onClick={deleteToDo}><FontAwesomeIcon icon={faTrashAlt}/></DeleteBtn>
+      <BtnWrap>
+        {isModify ? 
+          <ModifyBtn onClick={() => modifyDoneBtn(modifyText)}><FontAwesomeIcon icon={faPencilAlt}/></ModifyBtn>
+        : <ModifyBtn onClick={() => modifyBtn()}><FontAwesomeIcon icon={faPencilAlt}/></ModifyBtn>
+        }
+        <DeleteBtn onClick={deleteToDo}><FontAwesomeIcon icon={faTrashAlt}/></DeleteBtn>
+      </BtnWrap>
     </ToDoList> 
     
   );
@@ -57,12 +57,17 @@ const ToDo = ({ text, id, isDone }) => {
 export default ToDo;
 
 const ToDoList = styled.div`
+  display: flex;
+  justify-content: space-between;
   margin-bottom: 18px;
 `;
 
+const BtnWrap = styled.div`
+  display: flex;
+`;
+
 const CheckBoxIcon = styled(FontAwesomeIcon)`
-  color: ${props => props.theme.mainColor};
-  font-size: 1.4rem;
+font-size: .9rem;
 `;
 
 const CheckBoxInput = styled.input`
@@ -72,31 +77,29 @@ const CheckBoxInput = styled.input`
 
 const TextBox = styled.span`
   padding-left: 15px;
+  font-size: .9rem;
   font-weight: 500;
-  font-size: 1.2rem;
+  color: ${props => props.isDone && "#c1c1c1"};
+  text-decoration: ${props => props.isDone && "line-through #a1a1a1"};
 `;
 
 const DeleteBtn = styled.button`
-  width: 10%;
+  margin-left: 10px;
   background: transparent;
   border: none;
-  font-size: 1.1rem;
-  color: ${props => props.theme.mainColor};
+  font-size: .9rem;
 `;
 
 const ModifyBtn = styled.button`
-  width: 10%;
   background: transparent;
   border: none;
-  font-size: 1.1rem;
-  color: ${props => props.theme.mainColor};
+  font-size: .9rem;
 `;
 
 const ModifyInput = styled.input`
-  width: 70%;
   background: transparent;
   border: none;
-  font-size: 1.2rem;
+  font-size: .9rem;
   font-weight: 500;
   padding-left: 15px;
 

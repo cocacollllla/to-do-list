@@ -13,6 +13,8 @@ const theme = {
   `,
   fontTitle: "'Alata', sans-serif;",
   fontContent: "'Noto Sans KR', sans-serif;",
+  pcWidth: '1000px',
+  tabletWidth: '768px'
 };
 
 export default theme;

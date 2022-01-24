@@ -1,25 +1,39 @@
-import React, {useState} from 'react';
-import { toDoActions } from '../store';
+import React, {useEffect, useState} from 'react';
+import { todoActions } from '../store/todoSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import ToDo from './ToDo';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus} from "@fortawesome/free-solid-svg-icons";
+import Calendar from './Calendar';
+import moment from 'moment';
+import { dbService } from '../myFirebase';
+import { sendAddData } from '../store/todo-actions';
 
 const Main = () => {
   const [text, setText] = useState('');
-  const [currentId, setCurrentId] = useState(1);
+  const [value, setValue] = useState(moment());
+
+
+  const returnToday = () => setValue(moment());
+  const handleClickDay = (day) => setValue(day);
+  const jumpToMonth = (num) => (num ? setValue(value.clone().add(1, 'month')) : setValue(value.clone().subtract(1, 'month')));
+  
 
   const getStateList = useSelector(state => state);
-
   const todolist = [...getStateList]; 
   
   const dispatch = useDispatch();
 
-  const now = new Date();	
-  const year = now.getFullYear();
-  const month = ('0' + (now.getMonth() + 1)).slice(-2);
-  const day = ('0' + now.getDate()).slice(-2);
+  const day = value.format('YYYYMMDD');
+
+  useEffect(() => {
+    dbService.collection('todo').where('date', "==", day).onSnapshot((querySnapshot) => {
+      const getProduct = querySnapshot.docs.map(doc => ({ id:doc.id, ...doc.data()}));
+      dispatch(todoActions.replaceData(getProduct));
+    });
+  }, [day, dispatch]);
+
 
   const handleChangeNewToDo = (e) => {
     setText(e.target.value);
@@ -28,7 +42,7 @@ const Main = () => {
 
   const handleClickNewToDo = (e) => {
     e.preventDefault();
-    dispatch(toDoActions.add(text));
+    dispatch(sendAddData(day, text));
     setText('');
   }
 
@@ -46,37 +60,21 @@ const Main = () => {
     }
   });
 
-
-  const todolistIng = todolist.filter(list => list.isDone === false);
-  const todolistDone = todolist.filter(list => list.isDone === true);
-
-
-  const tabContents = {
-    1 : todolist,
-    2 : todolistIng,
-    3 : todolistDone
-  }
-
-  const tabMenus = ['전체', '할일', '완료'];
-  
   return (
     <Wrap>
+      <Calendar returnToday={returnToday} jumpToMonth={jumpToMonth} handleClickDay={handleClickDay} value={value} todolist={todolist} />
       <TodolistWrap>
-        <DateBox>{year}년 {month}월 {day}일</DateBox>
+        <DateBox>{value.format(`YYYY년 MM월 DD일`)}</DateBox>
         <form onSubmit={handleClickNewToDo}>
           <TodoInput onChange={handleChangeNewToDo} type="text" placeholder="할일을 입력하세요." value={text} />
           <TodoBtn><FontAwesomeIcon icon={faPlus}/></TodoBtn>
         </form>
-
-        <TabMenu>
-          {tabMenus.map((menu, idx) => (
-            <li key={idx} onClick={() => setCurrentId(idx + 1)} isactive={currentId === idx + 1 ? "true" : "false"}>{menu}</li>
-          ))}
-        </TabMenu>
        
-        {tabContents[currentId].map(todo => (
-          <ToDo {...todo} key={todo.id} curid={currentId}></ToDo>
-        ))}
+       <TodoWrap>
+          {todolist.map(todo => (
+            <ToDo {...todo} todolist={todolist} key={todo.id}></ToDo>
+          ))}
+        </TodoWrap>
       </TodolistWrap>
     </Wrap>
   );
@@ -89,21 +87,24 @@ export default Main;
 
 const Wrap = styled.div`
   height: 100vh;
-  background-color: ${props => props.theme.background};
-  ${({ theme }) => theme.flexMixin('column', 'center', 'center')};
+  background-color: #f1f1f1;
 `;
 
 const TodolistWrap = styled.div`
-  width: 400px;
-  height: 660px;
-  padding: 50px 30px;
-  background-color: ${props => props.theme.boxColor};
+  max-width: 360px;
+  height: auto;
+  padding: 30px 30px 50px 30px;
+  margin: 0 auto;
   border-radius:10px;
 `;
 
+const TodoWrap = styled.div`
+  margin-top: 30px;
+`;
+
 const DateBox = styled.div`
-  font-size: 1.7rem;
-  font-weight: bold;
+  font-size: 1.1rem;
+  font-weight: 500;
   padding: 0 0 20px 0;
 `;
 
@@ -114,7 +115,7 @@ const TodoInput = styled.input`
   background: transparent;
   border: none;
   border-bottom: 1px solid #ddd;
-  font-size: 1.1rem;
+  font-size: .9rem;
 
   ::placeholder,
   ::-webkit-input-placeholder {
@@ -134,21 +135,7 @@ const TodoBtn = styled.button`
   width: 10%;
   background: transparent;
   border: none;
-  font-size: 1.1rem;
-`;
-
-const TabMenu = styled.ul`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  margin-bottom: 30px;
-
-  li {
-    padding: 20px 0;
-    // border-bottom: 2px solid ${props => (props.isactive ? 'white' : 'black')};
-    font-size: 1.1rem;
-    font-weight: 500;
-    text-align: center;
-  }
+  font-size: .9rem;
 `;
 
 
