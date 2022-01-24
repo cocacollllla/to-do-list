@@ -2,9 +2,8 @@ import React, {useEffect, useState} from 'react';
 import { todoActions } from '../store/todoSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import ToDo from './ToDo';
+import { BsPlus } from "react-icons/bs";
 import styled from 'styled-components';
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus} from "@fortawesome/free-solid-svg-icons";
 import Calendar from './Calendar';
 import moment from 'moment';
 import { dbService } from '../myFirebase';
@@ -67,7 +66,7 @@ const Main = () => {
         <DateBox>{value.format(`YYYY년 MM월 DD일`)}</DateBox>
         <form onSubmit={handleClickNewToDo}>
           <TodoInput onChange={handleChangeNewToDo} type="text" placeholder="할일을 입력하세요." value={text} />
-          <TodoBtn><FontAwesomeIcon icon={faPlus}/></TodoBtn>
+          <TodoBtn><BsPlus /></TodoBtn>
         </form>
        
        <TodoWrap>

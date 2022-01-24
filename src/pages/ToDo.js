@@ -1,9 +1,8 @@
 import React, {useState} from 'react';
 import styled from 'styled-components';
 import { useDispatch } from 'react-redux';
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrashAlt, faPencilAlt } from "@fortawesome/free-solid-svg-icons";
-import { faSquare, faCheckSquare } from "@fortawesome/free-regular-svg-icons";
+import { RiCheckboxBlankLine, RiCheckboxFill } from "react-icons/ri";
+import { BiPencil, BiTrash } from "react-icons/bi";
 import { dbService } from '../myFirebase';
 import { doneToDoData, modifyToDoData } from '../store/todo-actions';
 
@@ -37,16 +36,16 @@ const ToDo = ({ text, id, isDone}) => {
   return (
     <ToDoList>
       <label>
-        <CheckBoxIcon icon={isDone ? faCheckSquare : faSquare}   />
+        {isDone ? <RiCheckboxFill /> : <RiCheckboxBlankLine />}
         <CheckBoxInput type="checkbox" defaultChecked={isDone} onChange={doneToDo} />
         {isModify ? <ModifyInput type="text" defaultValue={modifyText} onChange={handleChangeModifyInput} /> : <TextBox isDone={isDone}>{modifyText}</TextBox>}
       </label>
       <BtnWrap>
         {isModify ? 
-          <ModifyBtn onClick={() => modifyDoneBtn(modifyText)}><FontAwesomeIcon icon={faPencilAlt}/></ModifyBtn>
-        : <ModifyBtn onClick={() => modifyBtn()}><FontAwesomeIcon icon={faPencilAlt}/></ModifyBtn>
+          <ModifyBtn onClick={() => modifyDoneBtn(modifyText)}><BiPencil /></ModifyBtn>
+        : <ModifyBtn onClick={() => modifyBtn()}><BiPencil /></ModifyBtn>
         }
-        <DeleteBtn onClick={deleteToDo}><FontAwesomeIcon icon={faTrashAlt}/></DeleteBtn>
+        <DeleteBtn onClick={deleteToDo}><BiTrash /></DeleteBtn>
       </BtnWrap>
     </ToDoList> 
     
@@ -66,9 +65,6 @@ const BtnWrap = styled.div`
   display: flex;
 `;
 
-const CheckBoxIcon = styled(FontAwesomeIcon)`
-font-size: .9rem;
-`;
 
 const CheckBoxInput = styled.input`
   display: none;
@@ -81,6 +77,7 @@ const TextBox = styled.span`
   font-weight: 500;
   color: ${props => props.isDone && "#c1c1c1"};
   text-decoration: ${props => props.isDone && "line-through #a1a1a1"};
+  vertical-align: top;
 `;
 
 const DeleteBtn = styled.button`
