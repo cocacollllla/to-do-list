@@ -32,6 +32,17 @@ const Main = () => {
       dispatch(todoActions.replaceData(getProduct));
 
       const daytodolist = getProduct.filter(el => el.date === day);
+      daytodolist.sort((a,b) => {
+        if(a.isDone === b.isDone){
+          return 0
+        } else {
+          if(a.isDone) {
+            return 1
+          } else {
+            return -1
+          }
+        }
+      });
       setDayList(daytodolist);
     });
     
@@ -48,19 +59,6 @@ const Main = () => {
     dispatch(sendAddData(day, text));
     setText('');
   }
-
-
-  todolist.sort((a,b) => {
-    if(a.isDone === b.isDone){
-      return 0
-    } else {
-      if(a.isDone) {
-        return 1
-      } else {
-        return -1
-      }
-    }
-  });
 
   return (
     <Wrap>
