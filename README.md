@@ -2,7 +2,7 @@
 
 ## 배포주소
 
-[https://infallible-bhabha-147640.netlify.app/](https://infallible-bhabha-147640.netlify.app/)
+[https://bright-pixie-d356d2.netlify.app/](https://bright-pixie-d356d2.netlify.app/)
 
 ## 구현기능
 
@@ -11,7 +11,7 @@
 
 ## 시연영상
 
-![file](https://user-images.githubusercontent.com/86454345/150781894-da03d448-2832-48d3-ab41-7ef3f6a12d7f.gif)
+![file](https://user-images.githubusercontent.com/86454345/161219481-ebed73e7-392c-4a2e-8972-d55977efb7d8.gif)
 
 ## 설치 및 시작 방법
 ---
