@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import styled from 'styled-components';
 import { MdArrowBackIos, MdArrowForwardIos } from "react-icons/md";
 
-const Calendar = ({value, jumpToMonth, returnToday, handleClickDay}) => {
+const Calendar = ({value, jumpToMonth, returnToday, handleClickDay, todolist}) => {
   const [calendar, setCalendar] = useState([]);
 
   const startDay = value.clone().startOf('month').startOf('week');
@@ -32,11 +32,26 @@ const Calendar = ({value, jumpToMonth, returnToday, handleClickDay}) => {
     return day.isSame(new Date(), 'day')
   }
 
-  function dayStyles(day, value) {
+
+  function dayStyles(day, value, todolist) {
     if(grayed(day)) return 'grayed';
     if(isSelected(day, value)) return 'selected';
     if(isToday(day)) return 'today';
     return ''
+  }
+
+  const todoDoneState = (day, todolist) => {
+    const list = todolist.filter(el => el.date === day.format('YYYYMMDD'));
+    const doneList = list.filter(el => el.isDone === true);
+
+    if(doneList.length !== list.length) {
+      return 'tododo'
+    } else if(doneList.length > 0 && list.length > 0 && doneList.length === list.length) {
+      return 'tododo2'
+    } else if(list.length === 0) {
+      return ''
+    }
+
   }
 
 
@@ -63,7 +78,7 @@ const Calendar = ({value, jumpToMonth, returnToday, handleClickDay}) => {
           <Week key={week}>
           {week.map(day => 
             <Day key={day} onClick={() => handleClickDay(day)}>
-              <div className={dayStyles(day, value)}><span>{day.format('D').toString()}</span></div>
+              <div className={dayStyles(day, value, todolist)} id={todoDoneState(day, todolist)}><span>{day.format('D').toString()}</span></div>
             </Day>)}
           </Week>)}
       </div>
@@ -138,13 +153,65 @@ const Day = styled.div`
   div {
     padding: 1rem .5rem;
   }
+
   .selected {
-    background-color: salmon;
+    position: relative;
+
+    &:after {
+      content: '';
+      display: block;
+      box-sizing: border-box;
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      border: 1px solid #999;
+      border-radius: 10px;
+    }
   }
+
   .today span{
-    border-bottom: 2px solid #333
+    background-color: #ddd;
+    border-radius: 3px;
   }
+
   .grayed span{
     color: #c9c9c9;
+  }
+
+  #tododo span {
+    position: relative;
+    
+    &:after {
+      content:"";
+      display: block;
+      box-sizing: border-box;
+      position: absolute;
+      bottom: -7px;
+      left: 50%;
+      margin-left: -3.5px;
+      width: 7px;
+      height: 7px;
+      border: 2px solid salmon;
+      border-radius: 50%;
+    }
+  }
+
+  #tododo2 span {
+    position: relative;
+    
+    &:after {
+      content:"";
+      display: block;
+      position: absolute;
+      bottom: -7px;
+      left: 50%;
+      margin-left: -3.5px;
+      width: 7px;
+      height: 7px;
+      background-color: salmon;
+      border-radius: 50%;
+    }
   }
 `;

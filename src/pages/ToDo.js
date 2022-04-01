@@ -97,10 +97,13 @@ const ModifyInput = styled.input`
   background: transparent;
   border: none;
   font-size: .9rem;
-  font-weight: 500;
   padding-left: 15px;
+  vertical-align: top;
+  border-bottom: 1px solid #a1a1a1;
 
   &:focus {
     outline: none;
+    
+    
   }
 `;

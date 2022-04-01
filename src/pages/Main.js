@@ -12,13 +12,13 @@ import { sendAddData } from '../store/todo-actions';
 const Main = () => {
   const [text, setText] = useState('');
   const [value, setValue] = useState(moment());
+  const [dayList, setDayList] = useState([]);
 
 
   const returnToday = () => setValue(moment());
   const handleClickDay = (day) => setValue(day);
   const jumpToMonth = (num) => (num ? setValue(value.clone().add(1, 'month')) : setValue(value.clone().subtract(1, 'month')));
   
-
   const getStateList = useSelector(state => state);
   const todolist = [...getStateList]; 
   
@@ -27,10 +27,14 @@ const Main = () => {
   const day = value.format('YYYYMMDD');
 
   useEffect(() => {
-    dbService.collection('todo').where('date', "==", day).onSnapshot((querySnapshot) => {
+    dbService.collection("todo").onSnapshot((querySnapshot) => {
       const getProduct = querySnapshot.docs.map(doc => ({ id:doc.id, ...doc.data()}));
       dispatch(todoActions.replaceData(getProduct));
+
+      const daytodolist = getProduct.filter(el => el.date === day);
+      setDayList(daytodolist);
     });
+    
   }, [day, dispatch]);
 
 
@@ -44,7 +48,6 @@ const Main = () => {
     dispatch(sendAddData(day, text));
     setText('');
   }
-
 
 
   todolist.sort((a,b) => {
@@ -70,8 +73,8 @@ const Main = () => {
         </form>
        
        <TodoWrap>
-          {todolist.map(todo => (
-            <ToDo {...todo} todolist={todolist} key={todo.id}></ToDo>
+          {dayList.map(todo => (
+            <ToDo {...todo} todolist={dayList} key={todo.id}></ToDo>
           ))}
         </TodoWrap>
       </TodolistWrap>
